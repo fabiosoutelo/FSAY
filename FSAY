@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Minha Loja - Roupas, Tênis e Acessórios</title>
+  <style>
+    :root{
+      --bg:#0f172a; /* slate-900 */
+      --card:#111827; /* gray-900 */
+      --muted:#94a3b8; /* slate-400 */
+      --text:#e5e7eb; /* gray-200 */
+      --brand:#22c55e; /* green-500 */
+      --brand-hover:#16a34a; /* green-600 */
+      --danger:#ef4444; /* red-500 */
+      --shadow: 0 10px 25px rgba(0,0,0,.35);
+      --radius: 20px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;background:linear-gradient(180deg,#0b1224, #0f172a);color:var(--text);font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, Helvetica, sans-serif}
+    a{color:inherit;text-decoration:none}
+    img{display:block;max-width:100%;height:auto}
+
+    /* Header */
+    .container{max-width:1100px;margin:0 auto;padding:16px}
+    header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.75);backdrop-filter: blur(10px);border-bottom:1px solid rgba(255,255,255,.06)}
+    .header-wrap{display:flex;align-items:center;gap:12px}
+    .logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.5px}
+    .logo-badge{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg, var(--brand), #34d399);display:grid;place-items:center;box-shadow:var(--shadow)}
+    .logo-badge svg{width:22px;height:22px;fill:white}
+    .search{flex:1;position:relative}
+    .search input{width:100%;padding:12px 42px 12px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:#0b1224;color:var(--text);outline:none}
+    .search button{position:absolute;right:4px;top:4px;bottom:4px;border:0;border-radius:10px;padding:0 12px;background:var(--brand);color:white;cursor:pointer}
+    .actions{display:flex;align-items:center;gap:10px}
+    .btn{border:0;border-radius:12px;padding:10px 14px;background:#0b1224;color:var(--text);cursor:pointer;border:1px solid rgba(255,255,255,.08)}
+    .btn-primary{background:var(--brand);color:#081b10;border:0}
+    .btn-primary:hover{background:var(--brand-hover);color:white}
+
+    /* Hero */
+    .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-top:16px}
+    .hero-card{background:linear-gradient(180deg,#0b1224,#0e1a34);border:1px solid rgba(255,255,255,.06);padding:22px;border-radius:var(--radius);box-shadow:var(--shadow);position:relative;overflow:hidden}
+    .hero-card h1{margin:0 0 6px;font-size:28px}
+    .hero-card p{margin:0;color:var(--muted)}
+    .hero-card .tag{position:absolute;right:16px;top:16px;background:#10223b;border:1px solid rgba(255,255,255,.08);padding:6px 10px;border-radius:999px;font-size:12px;color:#a5b4fc}
+
+    /* Grid */
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:18px 0 40px}
+    .card{background:linear-gradient(180deg,#0b1224,#101a30);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+    .thumb{aspect-ratio:1/1;background:#0a0f1d;display:grid;place-items:center}
+    .thumb img{width:100%;height:100%;object-fit:cover}
+    .info{padding:14px;display:flex;flex-direction:column;gap:6px}
+    .title{font-weight:700}
+    .price{font-weight:800}
+    .muted{color:var(--muted);font-size:12px}
+    .badge{font-size:11px;padding:4px 8px;border-radius:999px;background:#0c1a15;color:#86efac;border:1px solid rgba(134,239,172,.25);width:max-content}
+
+    /* Cart Button */
+    .cart-btn{position:relative}
+    .cart-count{position:absolute;right:-6px;top:-6px;background:var(--danger);color:white;border-radius:999px;min-width:20px;height:20px;display:grid;place-items:center;font-size:12px;font-weight:700;padding:0 6px}
+
+    /* Drawer (Cart) */
+    .drawer{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:50}
+    .drawer.open{display:block}
+    .panel{position:absolute;right:0;top:0;bottom:0;width:420px;max-width:100%;background:#0b1224;border-left:1px solid rgba(255,255,255,.08);box-shadow:var(--shadow);display:flex;flex-direction:column}
+    .panel header{position:sticky;top:0;background:#0b1224;border-bottom:1px solid rgba(255,255,255,.08)}
+    .panel .content{padding:16px;flex:1;overflow:auto}
+    .line{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px;border:1px solid rgba(255,255,255,.06);border-radius:14px;background:linear-gradient(180deg,#0a1326,#0f1b35)}
+    .qty{display:flex;align-items:center;gap:8px}
+    .qty button{width:28px;height:28px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0b1224;color:var(--text);cursor:pointer}
+    .panel footer{padding:16px;border-top:1px solid rgba(255,255,255,.08);display:grid;gap:8px}
+
+    /* Checkout modal */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:60}
+    .modal.open{display:grid;place-items:center}
+    .modal-card{width:560px;max-width:94vw;background:#0b1224;border:1px solid rgba(255,255,255,.08);border-radius:20px;box-shadow:var(--shadow);padding:18px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .field{display:grid;gap:6px}
+    .field input, .field textarea{background:#0a1225;border:1px solid rgba(255,255,255,.1);color:var(--text);border-radius:12px;padding:10px;outline:none}
+    .field textarea{min-height:80px;resize:vertical}
+
+    /* Footer */
+    footer{border-top:1px solid rgba(255,255,255,.06);padding:26px 0;color:var(--muted)}
+
+    /* Responsive */
+    @media (max-width: 1024px){.grid{grid-template-columns:repeat(3,1fr)}.hero{grid-template-columns:1fr}}
+    @media (max-width: 720px){.grid{grid-template-columns:repeat(2,1fr)}.search{display:none}}
+    @media (max-width: 440px){.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-wrap">
+      <a class="logo" href="#">
+        <span class="logo-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M3 6a1 1 0 0 1 1-1h3l1-2h8l1 2h3a1 1 0 0 1 1 1v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM5 8v10h14V8z"/></svg>
+        </span>
+        <span>Minha Loja</span>
+      </a>
+      <div class="search" role="search">
+        <input id="searchInput" placeholder="Buscar produtos..." aria-label="Buscar produtos" />
+        <button id="searchBtn" class="btn-primary">Buscar</button>
+      </div>
+      <div class="actions">
+        <button id="openCart" class="btn cart-btn" aria-label="Abrir carrinho">
+          🛒 Carrinho
+          <span id="cartCount" class="cart-count" aria-live="polite">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero-card">
+        <span class="tag">Frete grátis acima de R$ 199</span>
+        <h1>Estilo que combina com você</h1>
+        <p>Roupas, tênis e acessórios com envio rápido e pagamento seguro (Pix, cartão e boleto via integração futura).</p>
+      </div>
+      <div class="hero-card">
+        <h2 style="margin:0 0 8px">Coleção Destaque</h2>
+        <p class="muted">Seleção curada da temporada – qualidade e preço justo.</p>
+      </div>
+    </section>
+
+    <section>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:10px 0 6px">
+        <h2 style="margin:0">Produtos</h2>
+        <div>
+          <label for="sort" class="muted" style="margin-right:8px">Ordenar:</label>
+          <select id="sort" class="btn" style="padding:10px">
+            <option value="relevance">Relevância</option>
+            <option value="price-asc">Menor preço</option>
+            <option value="price-desc">Maior preço</option>
+            <option value="name-asc">Nome A–Z</option>
+            <option value="name-desc">Nome Z–A</option>
+          </select>
+        </div>
+      </div>
+      <div id="grid" class="grid" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <!-- Drawer Carrinho -->
+  <div id="drawer" class="drawer" aria-hidden="true" role="dialog" aria-label="Carrinho">
+    <div class="panel">
+      <header>
+        <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px">
+          <strong>Carrinho</strong>
+          <button id="closeCart" class="btn" aria-label="Fechar carrinho">Fechar ✕</button>
+        </div>
+      </header>
+      <div class="content" id="cartLines"></div>
+      <footer>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span class="muted">Subtotal</span>
+          <strong id="subtotal">R$ 0,00</strong>
+        </div>
+        <button id="checkoutBtn" class="btn-primary" style="padding:14px;border-radius:14px;font-weight:800">Finalizar compra</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal Checkout (simulado) -->
+  <div id="checkoutModal" class="modal" role="dialog" aria-label="Finalizar compra">
+    <div class="modal-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <h3 style="margin:0">Dados para envio</h3>
+        <button id="closeCheckout" class="btn" aria-label="Fechar">✕</button>
+      </div>
+      <form id="checkoutForm">
+        <div class="row">
+          <div class="field">
+            <label>Nome completo</label>
+            <input required name="nome" placeholder="Seu nome" />
+          </div>
+          <div class="field">
+            <label>CPF</label>
+            <input required name="cpf" placeholder="000.000.000-00" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>Telefone</label>
+            <input required name="fone" placeholder="(xx) xxxxx-xxxx" />
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input required type="email" name="email" placeholder="voce@email.com" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Endereço</label>
+          <textarea required name="endereco" placeholder="Rua, número, bairro, cidade, UF, CEP"></textarea>
+        </div>
+        <div class="field">
+          <label>Observações</label>
+          <textarea name="obs" placeholder="Ex: entregar em horário comercial"></textarea>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px">
+          <span class="muted">Pagamento será simulado nesta demo.</span>
+          <button class="btn-primary" style="padding:12px 16px;border-radius:12px">Confirmar pedido</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <span>© <span id="year"></span> Minha Loja</span>
+      <span class="muted">Feito com HTML, CSS e JS puros. Integração de pagamento pode ser adicionada depois.</span>
+    </div>
+  </footer>
+
+<script>
+  // ====== UTIL ======
+  const R$ = (v)=> new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
+  const $ = (sel,el=document)=> el.querySelector(sel);
+  const $$ = (sel,el=document)=> [...el.querySelectorAll(sel)];
+
+  // ====== DADOS MOCK ======
+  const products = [
+    {id:'tn-01', name:'Tênis Runner Neo', price: 219.9, category:'tênis', tag:'novo', img:'https://picsum.photos/seed/tenis1/800/800'},
+    {id:'tn-02', name:'Tênis Street Pro', price: 289.9, category:'tênis', tag:'destaque', img:'https://picsum.photos/seed/tenis2/800/800'},
+    {id:'rp-01', name:'Camiseta Oversized', price: 89.9, category:'roupas', tag:'eco', img:'https://picsum.photos/seed/camiseta1/800/800'},
+    {id:'rp-02', name:'Jaqueta Windbreaker', price: 319.9, category:'roupas', tag:'novo', img:'https://picsum.photos/seed/jaqueta1/800/800'},
+    {id:'ac-01', name:'Boné Classic Fit', price: 69.9, category:'acessórios', tag:'+', img:'https://picsum.photos/seed/bone1/800/800'},
+    {id:'ac-02', name:'Mochila Urban 25L', price: 199.9, category:'acessórios', tag:'destaque', img:'https://picsum.photos/seed/mochila1/800/800'},
+    {id:'rp-03', name:'Calça Jogger Tech', price: 159.9, category:'roupas', tag:'novo', img:'https://picsum.photos/seed/calca1/800/800'},
+    {id:'tn-03', name:'Tênis Performance Air', price: 399.9, category:'tênis', tag:'pro', img:'https://picsum.photos/seed/tenis3/800/800'}
+  ];
+
+  // ====== ESTADO ======
+  const state = {
+    query: '',
+    sort: 'relevance',
+    cart: JSON.parse(localStorage.getItem('cart')||'{}') // {id: {qty: n}}
+  };
+
+  function saveCart(){
+    localStorage.setItem('cart', JSON.stringify(state.cart));
+    updateCartCount();
+  }
+
+  function updateCartCount(){
+    const count = Object.values(state.cart).reduce((s,i)=> s + i.qty, 0);
+    $('#cartCount').textContent = count;
+  }
+
+  // ====== RENDER PRODUTOS ======
+  function render(){
+    let list = products
+      .filter(p => p.name.toLowerCase().includes(state.query.toLowerCase()))
+    switch(state.sort){
+      case 'price-asc': list.sort((a,b)=> a.price-b.price); break;
+      case 'price-desc': list.sort((a,b)=> b.price-a.price); break;
+      case 'name-asc': list.sort((a,b)=> a.name.localeCompare(b.name)); break;
+      case 'name-desc': list.sort((a,b)=> b.name.localeCompare(a.name)); break;
+      default: /* relevance */ break;
+    }
+    const html = list.map(p=> `
+      <article class="card" aria-label="${p.name}">
+        <div class="thumb"><img src="${p.img}" alt="${p.name}"></div>
+        <div class="info">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
+            <span class="title">${p.name}</span>
+            <span class="badge">${p.tag}</span>
+          </div>
+          <span class="muted">Categoria: ${p.category}</span>
+          <strong class="price">${R$(p.price)}</strong>
+          <button class="btn-primary" style="padding:10px;border-radius:12px" data-add="${p.id}">Adicionar ao carrinho</button>
+        </div>
+      </article>
+    `).join('');
+    $('#grid').innerHTML = html || '<p class="muted">Nenhum produto encontrado.</p>';
+    // bind add buttons
+    $$('[data-add]').forEach(btn=> btn.addEventListener('click', e=> addToCart(e.target.dataset.add)));
+  }
+
+  // ====== CARRINHO ======
+  function addToCart(id){
+    const line = state.cart[id] || {qty:0};
+    line.qty += 1;
+    state.cart[id] = line;
+    saveCart();
+    openDrawer();
+    renderCart();
+  }
+  function removeFromCart(id){
+    delete state.cart[id];
+    saveCart();
+    renderCart();
+  }
+  function changeQty(id, delta){
+    const line = state.cart[id];
+    if(!line) return;
+    line.qty += delta;
+    if(line.qty <= 0) delete state.cart[id];
+    saveCart();
+    renderCart();
+  }
+  function cartLines(){
+    const ids = Object.keys(state.cart);
+    return ids.map(id=>{
+      const p = products.find(x=> x.id===id);
+      const qty = state.cart[id].qty;
+      const total = p.price*qty;
+      return {id, name:p.name, price:p.price, qty, total, img:p.img};
+    });
+  }
+  function subtotal(){
+    return cartLines().reduce((s,l)=> s + l.total, 0);
+  }
+  function renderCart(){
+    const lines = cartLines();
+    $('#subtotal').textContent = R$(subtotal());
+    if(!lines.length){
+      $('#cartLines').innerHTML = '<p class="muted">Seu carrinho está vazio.</p>';
+      return;
+    }
+    $('#cartLines').innerHTML = lines.map(l=> `
+      <div class="line">
+        <div style="display:flex;gap:12px;align-items:center">
+          <img src="${l.img}" alt="${l.name}" style="width:56px;height:56px;object-fit:cover;border-radius:12px;border:1px solid rgba(255,255,255,.08)">
+          <div>
+            <div style="font-weight:700">${l.name}</div>
+            <div class="muted">${R$(l.price)} / un</div>
+          </div>
+        </div>
+        <div class="qty">
+          <button aria-label="Diminuir quantidade" onclick="changeQty('${l.id}', -1)">−</button>
+          <strong>${l.qty}</strong>
+          <button aria-label="Aumentar quantidade" onclick="changeQty('${l.id}', 1)">+</button>
+        </div>
+        <div style="text-align:right">
+          <div><strong>${R$(l.total)}</strong></div>
+          <button class="btn" onclick="removeFromCart('${l.id}')">Remover</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ====== DRAWER / MODAL ======
+  const drawer = $('#drawer');
+  function openDrawer(){drawer.classList.add('open');drawer.setAttribute('aria-hidden','false');}
+  function closeDrawer(){drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');}
+
+  const checkoutModal = $('#checkoutModal');
+  function openCheckout(){checkoutModal.classList.add('open');}
+  function closeCheckout(){checkoutModal.classList.remove('open');}
+
+  // ====== BUSCA & ORDENACAO ======
+  $('#searchBtn').addEventListener('click', ()=>{ state.query = $('#searchInput').value.trim(); render(); });
+  $('#searchInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ state.query = e.target.value.trim(); render(); }});
+  $('#sort').addEventListener('change', (e)=>{ state.sort = e.target.value; render(); });
+
+  // ====== EVENTOS GLOBAL ======
+  $('#openCart').addEventListener('click', openDrawer);
+  $('#closeCart').addEventListener('click', closeDrawer);
+  drawer.addEventListener('click', (e)=>{ if(e.target===drawer) closeDrawer(); });
+
+  $('#checkoutBtn').addEventListener('click', ()=>{
+    if(Object.keys(state.cart).length===0){ alert('Seu carrinho está vazio.'); return; }
+    openCheckout();
+  });
+  $('#closeCheckout').addEventListener('click', closeCheckout);
+  checkoutModal.addEventListener('click', (e)=>{ if(e.target===checkoutModal) closeCheckout(); });
+
+  // ====== CHECKOUT (SIMULADO) ======
+  $('#checkoutForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    const resumo = cartLines().map(l=> `- ${l.qty}x ${l.name} = ${R$(l.total)}`).join('\n');
+    alert(
+      `Pedido confirmado!\n\nCliente: ${data.nome}\nEmail: ${data.email}\nSubtotal: ${R$(subtotal())}\n\nItens:\n${resumo}\n\n(Em produção você integrará um provedor de pagamento como Mercado Pago, PagBank ou Stripe.)`
+    );
+    state.cart = {}; saveCart(); renderCart(); closeCheckout(); closeDrawer();
+  });
+
+  // ====== INIT ======
+  $('#year').textContent = new Date().getFullYear();
+  render();
+  updateCartCount();
+  renderCart();
+</script>
+</body>
+</html>
